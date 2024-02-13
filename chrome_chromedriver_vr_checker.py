@@ -7,17 +7,23 @@ import requests
 import json
 import re
 
-# Get Chrome browser version via subprocess
-output = subprocess.check_output(r'wmic datafile where name="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" get Version /value', shell = True)
-
-# sets chrome browser version to a variable to compare
-x = output.decode('utf-8').strip()
-print(x, "chrome browser")
 
 #establish chromedriver_version as a global variable
 chromedriver_version = None
-#api link below
+#api url link below
 url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
+#chrome browser = x, chromedriver = y; making global variables for them
+x , y = "" , ""
+
+
+# Get Chrome browser version via subprocess
+#def get_chromebrowser_version(x): i attempted make this code below method and broke the program 
+output = subprocess.check_output(r'wmic datafile where name="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" get Version /value', shell = True)
+
+    # sets chrome browser version to a variable to compare
+x = output.decode('utf-8').strip()
+print(x, "chrome browser")
+    #return x
 
 
 # Get Chromedriver version via subprocess; this program assumes chromedriver.exe is in the same folder as the program itself
@@ -42,19 +48,9 @@ def get_chromedriver_version():
     else:
         print("Chromedriver not found. Please download and place it in the same directory.")
 
-# Call the function to set the global variable and for obtaining driver version
-get_chromedriver_version()
-
-# Now you can use 'chromedriver_version' elsewhere in your code
-print(f"Global Chromedriver version: {chromedriver_version}")
-
-
-# sets chrome driver version to a simpler variable to clean and compare
-y = chromedriver_version
-
 
 #cleans the x and y variable to proper comparing size; identical to method below
-def clean_intXY_variable(x):
+def clean_stringXY_variable(x):
     # Remove all non-integer characters except "."
     cleaned = ''.join(c for c in x if c.isdigit() or c == '.')
     
@@ -63,15 +59,6 @@ def clean_intXY_variable(x):
     
     return (cleaned)
 
-# This cluster runs the methods for cleaning x and y to 10 digit strings
-cleaned_x = clean_intXY_variable(x)
-print(cleaned_x,"clean chrome browser variable x")
-cleaned_y = clean_intXY_variable(y)
-print(cleaned_y,"clean chrome driver variable y")
-
-#for testing path where versions dont match, leave commented otherwise
-cleaned_x = "113.0.5672"
-print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
 
 # this method is searching for any matches that may be present and reports back if a match is found
 def extract_and_compare(url, z):
@@ -79,46 +66,65 @@ def extract_and_compare(url, z):
         # Fetch the JSON data from the URL
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception if the request fails
-        print("entered try for json extraction")
+        print("Initiating phase, entered try for json extraction")
             # Parse the JSON content
         data = json.loads(response.content.decode("utf-8"))
-
+        print("json data extracted, headed towards 'for loop'")
         # Loop through all the versions
-        for version_key, version_value in data.items():
-            print("version_key = ", version_key)
-            #print("version_value = ", version_value) do not uncomment otherwise terminal gets exploded with json data
-            if version_key == "versions":
-                # Compare the version with variable z                
-                if version_value == z:
-                    print(f"Version {z} found in the JSON data.")
-                    if "platform" in data:
-                        platform_value = data["platform"]
-                        if platform_value == "win64":
-                            # Extract the "url" value
-                            url_value = data.get("url")
-                            if url_value:
-                                print(f"Download URL for win64: {url_value}")
-                                # Add your download logic here
-                                # ...
-                            else:
-                                print("No URL found for win64.")
+        for version_value, version_key, version_key2, in data.items():
+            print("version_key =", version_key)
+            # Uncommenting the next line will cause the terminal to explode with JSON data
+            # print("version_value =", version_value)
+            if version_key == "versions": # Compare the version with the api json tag "versions"
+                print("step 1, versions")
+                if version_key2 == "version": # Compare the version with the api json tag "version"
+                    print(f"step 2, Version {z} found in the JSON data.")
+                    if "version" in data:
+                        if version_value == z: # Checking version of google chrome against the value of the json api; havent limited comparisons to 10 chars - will throw off results
+                            print("step 3, Entered value if statement")
+                            if "platform" in data: # enters and compares value to get right type of chrome driver, windows 64bit needed
+                                platform_value = data["platform"]
+                                if platform_value == "win64":
+                                    # Extract the "url" value
+                                    url_value = data.get("url")
+                                    if url_value:
+                                        print(f"Download URL for win64: {url_value}")
+                                        # Add download logic here
+                                        # ...
+                                    else:
+                                        print("No URL found for win64.")
                 else:
                     print(f"Version {z} not found in the JSON data.")
-                    #print("version_value = ", version_value)
-                    print("z = ", z)
+                    # Uncomment the next line to see the version_value
+                    # print("version_value =", version_value)
+                    print("z =", z)
                     # Add other actions if needed
                     # ...
-            else:print("version checker failed")
+            else:
+                print("Version checker failed. Make this code go to 'versions' first, then 'version', then 'platform', and obtain the 'url' from the JSON file.")
     except requests.RequestException as e:
         print(f"Error fetching data from the API: {e}")
 
-#this compares the two to see if chrome driver needs to be updated
-#def compare_and_extract_data():# was going to enclose the if statement below into a method; not sure as of yet - line 110
-        
 
-#this was for debugging because I kept getting incompatible data types
-#print(cleaned_x,cleaned_y,"compare check started")
-#print("X is a ",type(cleaned_x), "Y is a ",type(cleaned_y))        
+# Call the function to set the value global variables and print versions to cmd
+get_chromedriver_version()
+#get_chromebrowser_version(x) this is commented due to failed attempt to make methodat the top of program
+#print(f"Global Chromedriver version: {chromedriver_version}")
+# sets chrome driver version to a simpler variable to clean and compare
+y = chromedriver_version
+
+
+# This cluster runs the methods for cleaning x and y to 10 digit strings
+cleaned_x = clean_stringXY_variable(x)
+print(cleaned_x,"clean chrome browser variable x")
+cleaned_y = clean_stringXY_variable(y)
+print(cleaned_y,"clean chrome driver variable y")
+
+#for testing path where versions dont match, leave commented otherwise
+#cleaned_x = "113.0.5672"
+#print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
+
+#version id comparison between current chrome browser and chrome driver versions
 if cleaned_x == cleaned_y:(
     print("Versions are compatible for Scraping with Google Chrome")
 )
@@ -126,19 +132,14 @@ else:  #access api here to find correct version of chrome driver to match the ve
     print("Versions are incompatible; proceeding to obtain correct ChromeDriver version")
        
     #this cluster should make z an acceptable variable type and value for the api comparison; should it be string
-    try:
-        print("z = to cleaned_x", " - line 103")
+    try:       
         z = cleaned_x
-        print(z, " is ", type(z)," value change succesful  - line 105")
+        print("z as chromebrowser version id complete")
+        extract_and_compare(url, z)
+        print("extract_and_compare(url, z) was successful")
     except:
-        print("error occured, data type conversion for api comparison and extraction failed - line 103")
-        z = "121.68.6769"
-        print(z, " is ", type(z)) # this line is testing the variable type of z in terminal for debugging
-    
-    try:extract_and_compare(url, z)
-    except:print("method call failed")
-    
-            
+        print("method call failed; extract_and_compare(url, z) was unsuccessful")     
+
 
 print("Version Check for Chrome Scraping Setup complete, Press enter to continue")
 #input()
