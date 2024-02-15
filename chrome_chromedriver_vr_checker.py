@@ -11,18 +11,17 @@ import re
 #establish chromedriver_version as a global variable
 chromedriver_version = None
 #api url link below
-url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
+api_url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
 #chrome browser = x, chromedriver = y; making global variables for them
 x , y = "" , ""
-
-
-#def get_chromebrowser_version(): #attempted make this code below a method and broke the program
+filename = "chromedriver.exe"
+def chrome_browser_version():
 # Get Chrome browser version via subprocess
-output = subprocess.check_output(r'wmic datafile where name="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" get Version /value', shell = True)
-
+    output = subprocess.check_output(r'wmic datafile where name="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" get Version /value', shell = True)
 # sets chrome browser version to a variable to compare
-x = output.decode('utf-8').strip()
-print(x, "chrome browser")  
+    x = output.decode('utf-8').strip()
+    print(x, "chrome browser")  
+    return x
 
 # Get Chromedriver version via subprocess; this program assumes chromedriver.exe is in the same folder as the program itself
 def get_chromedriver_version():
@@ -46,6 +45,54 @@ def get_chromedriver_version():
     else:
         print("Chromedriver not found. Please download and place it in the same directory.")
 
+def download_file(url, filename):
+    # Send a HTTP request to the URL
+    print("inside download_file(url, filename)")
+    response = requests.get(url, stream=True)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Open the file in write mode
+        with open(filename, 'wb') as file:
+            # Write the contents of the response to the file
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    file.write(chunk)
+        print(f"File downloaded successfully: {filename}")
+    else:
+        print(f"Failed to download file. Status code: {response.status_code}")
+
+def main():
+
+    response = requests.get(api_url)
+    data = response.json()
+    versions_list = data['versions']  
+
+    for version_info in versions_list:
+        version_number = version_info['version']
+        downloads = version_info['downloads']
+
+        for download_type, download_info in downloads.items():
+
+                if download_type == 'chromedriver':
+                    download_info = str(download_info).replace ("'", '"')
+                    download_info = json.loads(download_info)
+
+                    for platform_and_url in download_info:
+                        platform = platform_and_url['platform']
+                        url = platform_and_url['url']
+
+                        if platform == 'win64':
+                            print(f"Version: {version_number},\n URL: {url}\n")
+                            urlz = url
+                            if version_number==z:
+                                print("Version ", z, "found")
+                                try:download_file(urlz, filename)
+                                except:print("download_file failed")
+                                print(urlz)
+                                input()
+                                
+
 
 #cleans the x and y variable to proper comparing size; identical to method below
 def clean_stringXY_variable(x):
@@ -57,15 +104,17 @@ def clean_stringXY_variable(x):
     
     return (cleaned)
 
-# Call the function to set the value global variables and print versions to cmd
-get_chromedriver_version()
-# sets chrome driver version to a simpler variable to clean and compare
-y = chromedriver_version
 
-#this comment cluster pertain to "x" and chromebrowser version being a method than loose code at the top of program
-#print(x,"after calling chrome browser version method when implemented")
-#get_chromebrowser_version() this is commented due to failed attempt to make method at the top of program
-#print(f"Global Chromedriver version: {chromedriver_version}")
+def download_file(url, filename):
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an exception if the request fails
+    with open(filename, 'wb') as file:
+        file.write(response.content)
+
+# Call the function to set the value global variables to x and y and print versions to cmd
+x = chrome_browser_version()
+get_chromedriver_version()
+y = chromedriver_version
 
 
 # This cluster runs the methods for cleaning x and y to 10 digit strings
@@ -78,40 +127,17 @@ cleaned_y = clean_stringXY_variable(y)
 cleaned_x = "122.0.6254.0"
 print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
 
+
 #version id comparison between current chrome browser and chrome driver versions
 if cleaned_x == cleaned_y:(
     print("Versions are compatible for Scraping with Google Chrome")
 )
 else:  #access api here to find correct version of chrome driver to match the version of chrome browser
-    print("Versions are incompatible; proceeding to obtain correct ChromeDriver version")
-    #this cluster should make z an acceptable variable type and value for the api comparison; should it be string
-    z = cleaned_x 
-    print("z as chromebrowser version id complete")
+    print("Versions are incompatible; Proceeding to obtain correct ChromeDriver version")
+    z = cleaned_x
 
-    try:
-        print("4th attempt to parse json file started")
-        
-        # Fetch the JSON data from the URL       
-        response = requests.get('https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json')
-        response.raise_for_status()  # Raise an exception if the request fails
-        # Parse the JSON content
-        data = json.loads(response.content.decode("utf-8"))
-        #print lines to see what data spits up
-        print("line 251")
-        print(data['versions'][0])
-        print("line 263")
-        # Now you can access elements in the JSON data
-        i = 0
-        for i in range(len(data['versions'])): 
-            first_version = data['versions'][0]['version']
-            print("first_version = ", first_version)
-            if data['versions'][i]['version'] == z:
-                print(f"Match found at index {i}")
-                break  # This will exit the loop immediately
-            i = i + 1
-        else:print("no match found")
-
-    except:print("4th attempt to parse json file failed")
+    try:main()
+    except:print("main method failed")
 
 print("Version Check for Chrome Scraping Setup complete, Press enter to continue")
 #input()
