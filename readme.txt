@@ -9,3 +9,8 @@ this may cause issues when it comes to scaling; not too sure how it will affect 
 there are some parts in which are incomplete as of 2\13\24
 - api access and download of correct chromedriver version
 - proper organization of code into clear methods
+
+DATE: 2/20/24
+finished functionality, downloads the chromedriver.exe to the downloads folder.
+try and excepts included to handle errors gracefully
+cleaned up code and elimnated excess print lines and unnessecary lines
