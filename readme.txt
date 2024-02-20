@@ -14,3 +14,10 @@ DATE: 2/20/24
 finished functionality, downloads the chromedriver.exe to the downloads folder.
 try and excepts included to handle errors gracefully
 cleaned up code and elimnated unnessecary lines & excess print lines
+
+fixed bug where version in api was not matching length of z
+fixed bug where chromedriver was not checking version correctly
+
+issues:api download obtains faulty file from url.
+however, if done manually, the link gets the correct version
+idea: maybe the chrome driver isnt extracted properly and is still compressed, hence it is smaller and errors occur?

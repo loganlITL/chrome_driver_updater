@@ -1,16 +1,20 @@
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
 import subprocess
-import os
 import requests
 import json
+import os
 
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.realpath(__file__))
 
 #api url link below
 api_url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
 #chrome browser = x, chromedriver = y;
-x , y = "" , ""
+x , y ,b = "" , "" , ""
 filename = "chromedriver.exe"
+chromedriver_version = ""
 
 def chrome_browser_version():
 # Get Chrome browser version via subprocess
@@ -40,7 +44,7 @@ def get_chromedriver_version():
         except Exception as e:
             print(f"Error getting Chromedriver version: {e}")
     else:
-        print("Chromedriver not found. Please download and place it in the same directory.")
+        print("Chromedriver not found.")
 
 def main():
 
@@ -65,21 +69,21 @@ def main():
                         if platform == 'win64':
                             #print(f"Version: {version_number},\n URL: {url}\n")
                             
-                            if version_number==z:
+                            if truncate_string(version_number)==truncate_string(z):
                                 print("Version ", z, "found")
                                 global url_master
                                 url_master = url
-                                download_file(url_master, filename)
+                                print(url_master)
+                                download_file(url_master, filename)#runs download method for specific chrome driver version
                                 return #terminate method after 1 match is found
-                                
-                                
+                               
 def download_file(url, filename):
     # Send a HTTP request to the URL
     response = requests.get(url)
     # Check if the request was successful
     if response.status_code == 200:
         # Set the output directory to your desired location (Downloads folder)
-        output_directory = os.path.expanduser("~/Downloads")     
+        output_directory = os.path.expanduser(script_dir)     
         # Create a file path by joining the directory name with the desired file name
         file_path = os.path.join(output_directory, filename)
         # Open the file in write mode
@@ -89,7 +93,6 @@ def download_file(url, filename):
             print(f"File downloaded successfully: {filename}")
     else:
         print(f"Failed to download file. Status code: {response.status_code}")
-
 
 #cleans the x and y variable to proper comparing size; identical to method below
 def clean_stringXY_variable(x):
@@ -101,6 +104,10 @@ def clean_stringXY_variable(x):
     
     return (cleaned)
 
+def truncate_string(input_string):
+    # Truncate the string to the first 10 characters
+    truncated_string = input_string[:10]
+    return truncated_string
 
 # Call the function to set the value global variables to x and y and print versions to cmd
 x = chrome_browser_version()
@@ -112,11 +119,11 @@ cleaned_x = clean_stringXY_variable(x)
 cleaned_y = clean_stringXY_variable(y)
 
 #for testing path where versions dont match, leave commented otherwise
-cleaned_x = "122.0.6254.0"
-print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
-
+#cleaned_x = "122.0.6254.0"
+#print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
 
 #version id comparison between current chrome browser and chrome driver versions
+print(cleaned_x," x val, ",cleaned_y, " y val")
 if cleaned_x == cleaned_y:(
     print("Versions are compatible for Scraping with Google Chrome")
 )
