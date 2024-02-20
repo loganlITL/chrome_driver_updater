@@ -1,20 +1,17 @@
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 import subprocess
 import os
 import requests
 import json
-import re
 
 
-#establish chromedriver_version as a global variable
-chromedriver_version = None
 #api url link below
 api_url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
-#chrome browser = x, chromedriver = y; making global variables for them
+#chrome browser = x, chromedriver = y;
 x , y = "" , ""
 filename = "chromedriver.exe"
+
 def chrome_browser_version():
 # Get Chrome browser version via subprocess
     output = subprocess.check_output(r'wmic datafile where name="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" get Version /value', shell = True)
@@ -45,23 +42,6 @@ def get_chromedriver_version():
     else:
         print("Chromedriver not found. Please download and place it in the same directory.")
 
-def download_file(url, filename):
-    # Send a HTTP request to the URL
-    print("inside download_file(url, filename)")
-    response = requests.get(url, stream=True)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        # Open the file in write mode
-        with open(filename, 'wb') as file:
-            # Write the contents of the response to the file
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    file.write(chunk)
-        print(f"File downloaded successfully: {filename}")
-    else:
-        print(f"Failed to download file. Status code: {response.status_code}")
-
 def main():
 
     response = requests.get(api_url)
@@ -83,15 +63,32 @@ def main():
                         url = platform_and_url['url']
 
                         if platform == 'win64':
-                            print(f"Version: {version_number},\n URL: {url}\n")
-                            urlz = url
+                            #print(f"Version: {version_number},\n URL: {url}\n")
+                            
                             if version_number==z:
                                 print("Version ", z, "found")
-                                try:download_file(urlz, filename)
-                                except:print("download_file failed")
-                                print(urlz)
-                                input()
+                                global url_master
+                                url_master = url
+                                download_file(url_master, filename)
+                                return #terminate method after 1 match is found
                                 
+                                
+def download_file(url, filename):
+    # Send a HTTP request to the URL
+    response = requests.get(url)
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Set the output directory to your desired location (Downloads folder)
+        output_directory = os.path.expanduser("~/Downloads")     
+        # Create a file path by joining the directory name with the desired file name
+        file_path = os.path.join(output_directory, filename)
+        # Open the file in write mode
+        with open(file_path, 'wb') as file:
+            # Write the contents of the response to the file
+            file.write(response.content)
+            print(f"File downloaded successfully: {filename}")
+    else:
+        print(f"Failed to download file. Status code: {response.status_code}")
 
 
 #cleans the x and y variable to proper comparing size; identical to method below
@@ -105,23 +102,14 @@ def clean_stringXY_variable(x):
     return (cleaned)
 
 
-def download_file(url, filename):
-    response = requests.get(url)
-    response.raise_for_status()  # Raise an exception if the request fails
-    with open(filename, 'wb') as file:
-        file.write(response.content)
-
 # Call the function to set the value global variables to x and y and print versions to cmd
 x = chrome_browser_version()
 get_chromedriver_version()
 y = chromedriver_version
 
-
 # This cluster runs the methods for cleaning x and y to 10 digit strings
 cleaned_x = clean_stringXY_variable(x)
-#print(cleaned_x,"clean chrome browser variable x")
 cleaned_y = clean_stringXY_variable(y)
-#print(cleaned_y,"clean chrome driver variable y")
 
 #for testing path where versions dont match, leave commented otherwise
 cleaned_x = "122.0.6254.0"
@@ -140,5 +128,5 @@ else:  #access api here to find correct version of chrome driver to match the ve
     except:print("main method failed")
 
 print("Version Check for Chrome Scraping Setup complete, Press enter to continue")
-#input()
+input()
 print("Proceeding to next step.")
