@@ -13,4 +13,4 @@ there are some parts in which are incomplete as of 2\13\24
 DATE: 2/20/24
 finished functionality, downloads the chromedriver.exe to the downloads folder.
 try and excepts included to handle errors gracefully
-cleaned up code and elimnated excess print lines and unnessecary lines
+cleaned up code and elimnated unnessecary lines & excess print lines
