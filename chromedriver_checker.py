@@ -1,8 +1,5 @@
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
-import subprocess
-import requests
-import json
 import os
 
 def get_chromedriver_version():
