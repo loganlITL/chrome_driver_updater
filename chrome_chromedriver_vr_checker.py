@@ -119,39 +119,39 @@ def download_file(url, filename):
         print(f"File moved to script directory: {output_directory}/{filename}")
     else:
         print(f"Failed to download file. Status code: {response.status_code}")
+class Version:
+    def main():
 
-def main():
+        # Call the function to set the value global variables to x and y and print versions to cmd
+        x = chrome_browser_version()
+        get_chromedriver_version()
+        y = chromedriver_version
 
-    # Call the function to set the value global variables to x and y and print versions to cmd
-    x = chrome_browser_version()
-    get_chromedriver_version()
-    y = chromedriver_version
+        # This cluster runs the methods for cleaning x and y to 10 digit strings
+        cleaned_x = clean_stringXY_variable(x)
+        cleaned_y = clean_stringXY_variable(y)
 
-    # This cluster runs the methods for cleaning x and y to 10 digit strings
-    cleaned_x = clean_stringXY_variable(x)
-    cleaned_y = clean_stringXY_variable(y)
+        #for testing path where versions dont match, leave commented otherwise
+        #cleaned_x = "122.0.6254.0"
+        #print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
 
-    #for testing path where versions dont match, leave commented otherwise
-    #cleaned_x = "122.0.6254.0"
-    #print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
+        #version id comparison between current chrome browser and chrome driver versions
+        #print(cleaned_x," x val, ",cleaned_y, " y val")
+        if cleaned_x == cleaned_y:(
+            print("Versions are compatible for Scraping with Google Chrome")
+        )
+        else:  #access api here to find correct version of chrome driver to match the version of chrome browser
+            print("Versions are incompatible; Proceeding to obtain correct ChromeDriver version")
+            global z
+            z = cleaned_x
 
-    #version id comparison between current chrome browser and chrome driver versions
-    #print(cleaned_x," x val, ",cleaned_y, " y val")
-    if cleaned_x == cleaned_y:(
-        print("Versions are compatible for Scraping with Google Chrome")
-    )
-    else:  #access api here to find correct version of chrome driver to match the version of chrome browser
-        print("Versions are incompatible; Proceeding to obtain correct ChromeDriver version")
-        global z
-        z = cleaned_x
+            try:api_parser()
+            except:print("main method failed")
 
-        try:api_parser()
-        except:print("main method failed")
-
-    print("Version Check for Chrome Scraping Setup complete, Press enter to continue")
-    #input()
-    print("Proceeding to next step.")
+        print("Version Check for Chrome Scraping Setup complete, Press enter to continue")
+        input()
+        print("Proceeding to next step.")
 
 
 if __name__ == '__main__':
-    main()
+    Version.main()
