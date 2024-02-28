@@ -119,6 +119,7 @@ def download_file(url, filename):
         print(f"File moved to script directory: {output_directory}/{filename}")
     else:
         print(f"Failed to download file. Status code: {response.status_code}")
+        
 class Version:
     def main():
 
@@ -136,7 +137,6 @@ class Version:
         #print("cleaned_x has been changed to ",cleaned_x, "for debugging purposes for incompatable versions")
 
         #version id comparison between current chrome browser and chrome driver versions
-        #print(cleaned_x," x val, ",cleaned_y, " y val")
         if cleaned_x == cleaned_y:(
             print("Versions are compatible for Scraping with Google Chrome")
         )
@@ -146,7 +146,7 @@ class Version:
             z = cleaned_x
 
             try:api_parser()
-            except:print("main method failed")
+            except:print("api_parser failed")
 
         print("Version Check for Chrome Scraping Setup complete, Press enter to continue")
         input()
