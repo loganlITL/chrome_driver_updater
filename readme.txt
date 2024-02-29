@@ -6,7 +6,7 @@ If the 2 versions are not identical, then the program will access the json api t
 
 class Version holds the main method which runs the program.
 
-If the program fails to download, it still attempts to post a link to the terminal for manual download.
+If the program fails to download the new version of ChromeDriver, it still attempts to post a link to the terminal for manual download.
 
 ******************HOW TO USE*****************
 
@@ -24,7 +24,7 @@ shutil
 subprocess
 
 *All of these need to be installed through pip for this program to run without issues
-This program has been tested and developed for Windows 11 with selenium 3 and python 3.12
+This program has been tested and developed for Windows 11 with selenium 4 and python 3.12
 
 
 You must have this program in the same folder as your own program since chromedriver.exe is programmed to go to the same directory as this program after it is unzipped.
